@@ -69,6 +69,34 @@ func TestErrorHandler(t *testing.T) {
 			t.Errorf("expected 500, got %d", rec.Code)
 		}
 	})
+
+	t.Run("EchoHandler Adapter", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+
+		// Test that basic errors fall back to 500
+		err := errors.New("fallback error")
+		handler.EchoHandler(err, c)
+
+		if rec.Code != 500 {
+			t.Errorf("expected 500, got %d", rec.Code)
+		}
+	})
+
+	t.Run("EchoHandler Native HTTPError", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+
+		// Test that native echo errors map accurately
+		err := echo.NewHTTPError(http.StatusNotFound, "Not Found Route")
+		handler.EchoHandler(err, c)
+
+		if rec.Code != 404 {
+			t.Errorf("expected 404, got %d", rec.Code)
+		}
+	})
 }
 
 func TestSanitizeBody(t *testing.T) {

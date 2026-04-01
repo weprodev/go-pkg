@@ -8,6 +8,7 @@ package api
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"log/slog"
 
@@ -63,6 +64,23 @@ func (h *EchoErrorHandler) HandleError(c echo.Context, err error, operation stri
 		)
 	}
 	return c.JSON(httperr.StatusInternalServer, httperr.ErrInternalServer)
+}
+
+// EchoHandler adapts EchoErrorHandler to echo.HTTPErrorHandler for global registration.
+// It uses "http_request" as the default operation context.
+func (h *EchoErrorHandler) EchoHandler(err error, c echo.Context) {
+	// If the response was already committed, we shouldn't send another JSON
+	if c.Response().Committed {
+		return
+	}
+	// Echo's default error maps like 404 and 405 are returned as *echo.HTTPError
+	var he *echo.HTTPError
+	if errors.As(err, &he) {
+		_ = c.JSON(he.Code, httperr.NewServiceError(he.Code, fmt.Sprintf("%v", he.Message)))
+		return
+	}
+
+	_ = h.HandleError(c, err, "http_request")
 }
 
 // EchoUnescapedHTMLJSONSerializer is a JSON serializer that disables HTML escaping.

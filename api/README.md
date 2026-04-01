@@ -19,10 +19,7 @@ func main() {
     e := echo.New()
     
     // Set our standard error handler
-    errorHandler := api.NewEchoErrorHandler(slog.Default())
-    e.HTTPErrorHandler = func(err error, c echo.Context) {
-        errorHandler.HandleError(c, err, "request")
-    }
+    e.HTTPErrorHandler = api.NewEchoErrorHandler(slog.Default()).EchoHandler
 
     // Register routes safely
     routes := []api.EchoRouteConfig{
