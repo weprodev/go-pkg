@@ -1,0 +1,49 @@
+environment: production
+
+server:
+  port: 8080
+  read_timeout: 30s
+  write_timeout: 30s
+
+# Database configuration - sensitive values come from environment variables (Secret Manager)
+db:
+  host: ""  # Set via DB_HOST environment variable (fallback for non-Cloud SQL)
+  connection_name: ""  # Set via DB_CONNECTION_NAME environment variable (Cloud SQL)
+  port: 5432  # Set via DB_PORT environment variable
+  user: ""  # Set via DB_USER environment variable
+  password: ""  # Set via DB_PASSWORD environment variable (from Secret Manager)
+  dbname: ""  # Set via DB_NAME environment variable
+  sslmode: require
+  max_open_conns: 25
+  max_idle_conns: 10
+  read_timeout: 5s
+  write_timeout: 10s
+
+# Security configuration - sensitive values come from environment variables (Secret Manager)
+security:
+  jwt_secret: ""  # Set via JWT_SECRET environment variable (from Secret Manager)
+  token_expiry: 24h  # Longer expiry for production
+  allowed_hosts:
+    - "api.weprodev.com"
+    - "*.weprodev.com"
+
+# Auth configuration - sensitive values come from environment variables (Secret Manager)
+auth:
+  jwt_secret: ""  # Set via AUTH_JWT_SECRET environment variable (from Secret Manager)
+  user_service_url: ""  # Set via AUTH_USER_SERVICE_URL environment variable
+
+# Notification configuration - sensitive values come from environment variables (Secret Manager)
+notification:
+  email:
+    provider: mailgun  # Set via EMAIL_PROVIDER environment variable
+    mailgun:
+      api_key: ""       # Set via MAILGUN_API_KEY environment variable (from Secret Manager)
+      domain: ""        # Set via MAILGUN_DOMAIN environment variable
+      from_email: "noreply@weprodev.com"
+      from_name: "WeProDev"
+
+# Logging configuration
+logging:
+  level: "warn"  # Less verbose logging in production
+  format: "json"
+  output_path: "stdout"

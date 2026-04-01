@@ -1,0 +1,46 @@
+environment: local
+
+server:
+  port: 8080
+  read_timeout: 10s
+  write_timeout: 10s
+
+logging:
+  level: debug
+  format: json
+  output_path: stdout
+
+security:
+  jwt_secret: "test-jwt-secret-key-for-local-development-only"
+  token_expiry: 72h
+  allowed_hosts:
+    - "localhost"
+    - "127.0.0.1"
+    - "0.0.0.0"
+
+auth:
+  jwt_secret: "test-auth-jwt-secret-for-local-development"
+  user_service_url: "http://localhost:8080"
+
+db:
+  type: postgresql
+  host: localhost
+  connection_name: ""
+  port: 5432
+  user: test_user
+  password: test_password
+  dbname: test_db
+  sslmode: disable
+  max_open_conns: 25
+  max_idle_conns: 25
+  read_timeout: 5s
+  write_timeout: 10s
+
+notification:
+  email:
+    provider: memory
+    mailgun:
+      api_key: ""
+      domain: ""
+      from_email: "test@weprodev.com"
+      from_name: "WeProDev Test"
