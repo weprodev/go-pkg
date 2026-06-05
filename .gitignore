@@ -1,0 +1,64 @@
+# Development
+.history/
+.cursor/
+.agent/
+.flowai/
+.gemini/
+.claude/
+.specify/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDEs and Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Go
+bin/
+dist/
+main
+serverbin/
+wpd-message-gateway
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+go.work.sum
+
+# Frontend (Vite / React / Storybook)
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/storybook-static/
+frontend/.eslintcache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment & Configuration Variables
+.env
+.env.local
+.env.*.local
+configs/*.yml
+!configs/*.example.yml
+
+# Vendor
+vendor/
+
+# Agent signal files (transient, not committed)
+.specify/signals/*.ready
