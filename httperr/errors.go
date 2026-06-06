@@ -27,9 +27,10 @@ const (
 
 // ServiceError represents a service error with an HTTP status code and messages.
 type ServiceError struct {
-	Code    int      `json:"code"`
-	Message string   `json:"message"`
-	Errors  []string `json:"errors,omitempty"`
+	Code          int      `json:"code"`
+	Message       string   `json:"message"`
+	Errors        []string `json:"errors,omitempty"`
+	CorrelationID string   `json:"correlation_id,omitempty"`
 }
 
 // Error implements the error interface.

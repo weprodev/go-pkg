@@ -49,9 +49,20 @@ func NewEchoErrorHandler(logger *slog.Logger) *EchoErrorHandler {
 // and message are used directly; otherwise a generic 500 is returned and the
 // original error is logged.
 func (h *EchoErrorHandler) HandleError(c echo.Context, err error, operation string) error {
+	reqID := c.Response().Header().Get(echo.HeaderXRequestID)
+	if reqID == "" {
+		reqID = c.Request().Header.Get(echo.HeaderXRequestID)
+	}
+
 	var se httperr.ServiceError
 	if errors.As(err, &se) {
-		return c.JSON(se.Code, se)
+		respErr := httperr.ServiceError{
+			Code:          se.Code,
+			Message:       se.Message,
+			Errors:        se.Errors,
+			CorrelationID: reqID,
+		}
+		return c.JSON(se.Code, respErr)
 	}
 
 	// Unknown error — log it and return 500.
@@ -61,9 +72,15 @@ func (h *EchoErrorHandler) HandleError(c echo.Context, err error, operation stri
 			"operation", operation,
 			"path", c.Request().URL.Path,
 			"method", c.Request().Method,
+			"request_id", reqID,
 		)
 	}
-	return c.JSON(httperr.StatusInternalServer, httperr.ErrInternalServer)
+	respErr := httperr.ServiceError{
+		Code:          httperr.StatusInternalServer,
+		Message:       "internal server error",
+		CorrelationID: reqID,
+	}
+	return c.JSON(httperr.StatusInternalServer, respErr)
 }
 
 // EchoHandler adapts EchoErrorHandler to echo.HTTPErrorHandler for global registration.
@@ -76,7 +93,16 @@ func (h *EchoErrorHandler) EchoHandler(err error, c echo.Context) {
 	// Echo's default error maps like 404 and 405 are returned as *echo.HTTPError
 	var he *echo.HTTPError
 	if errors.As(err, &he) {
-		_ = c.JSON(he.Code, httperr.NewServiceError(he.Code, fmt.Sprintf("%v", he.Message)))
+		reqID := c.Response().Header().Get(echo.HeaderXRequestID)
+		if reqID == "" {
+			reqID = c.Request().Header.Get(echo.HeaderXRequestID)
+		}
+		respErr := httperr.ServiceError{
+			Code:          he.Code,
+			Message:       fmt.Sprintf("%v", he.Message),
+			CorrelationID: reqID,
+		}
+		_ = c.JSON(he.Code, respErr)
 		return
 	}
 
