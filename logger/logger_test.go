@@ -32,10 +32,14 @@ func TestLogger_NewWithWriter(t *testing.T) {
 	}
 }
 
+type ctxKey string
+
+const traceIDKey ctxKey = "trace_id"
+
 func TestLogger_WithContext(t *testing.T) {
 	var buf bytes.Buffer
 	extractor := func(ctx context.Context) []any {
-		if val, ok := ctx.Value("trace_id").(string); ok {
+		if val, ok := ctx.Value(traceIDKey).(string); ok {
 			return []any{"trace_id", val}
 		}
 		return nil
@@ -48,7 +52,7 @@ func TestLogger_WithContext(t *testing.T) {
 	}
 
 	log, _ := logger.NewWithWriter(&buf, cfg)
-	ctx := context.WithValue(context.Background(), "trace_id", "abc-123")
+	ctx := context.WithValue(context.Background(), traceIDKey, "abc-123")
 
 	logCtx := log.WithContext(ctx)
 	logCtx.Debug("context matters")
